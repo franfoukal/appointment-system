@@ -32,6 +32,7 @@ func LoadConfiguration() (Config, error) {
 
 func loadFilePath() string {
 	filepath := fmt.Sprintf("%s%s", environment.Get().String(), ymlExtension)
+	logger.Infof("config filpath: %s", filepath)
 	return strings.ToLower(filepath)
 }
 

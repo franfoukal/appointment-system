@@ -5,27 +5,38 @@ import (
 	"strings"
 )
 
-type Environment int
+type (
+	Environment string
 
-const (
-	Prod Environment = iota
-	Test
-	Local
+	environmentType struct {
+		Test       Environment
+		Local      Environment
+		Production Environment
+	}
 )
 
-func (d Environment) String() string {
-	return [...]string{"PRODUCTION", "TEST", "LOCAL"}[d]
+var (
+	EnvironmentType = environmentType{
+		Test:       Environment("test"),
+		Local:      Environment("local"),
+		Production: Environment("production"),
+	}
+)
+
+func (env Environment) String() string {
+	return string(env)
 }
 
 func Get() Environment {
-	switch strings.ToUpper(os.Getenv("ENVIRONMENT")) {
-	case "PRODUCTION":
-		return Prod
-	case "TEST":
-		return Test
-	case "DEVELOPMENT":
-		return Local
+	env := os.Getenv("ENVIRONMENT")
+	switch strings.ToLower(env) {
+	case EnvironmentType.Local.String():
+		return EnvironmentType.Local
+	case EnvironmentType.Test.String():
+		return EnvironmentType.Test
+	case EnvironmentType.Production.String():
+		return EnvironmentType.Production
 	default:
-		return Local
+		return EnvironmentType.Local
 	}
 }
