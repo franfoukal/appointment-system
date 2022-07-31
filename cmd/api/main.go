@@ -21,14 +21,14 @@ func main() {
 		panic(err)
 	}
 
-	app.BuildDependencies()
+	resources := app.BuildDependencies()
 
 	// DEBUG
 	env := environment.Get()
 	logger.Infof("env: %s", env)
 	logger.Infof("Configs: %+v", cfg)
 
-	app.InitRoutes(r)
+	app.InitRoutes(r, resources)
 
 	r.Run()
 }
