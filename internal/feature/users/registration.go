@@ -11,7 +11,9 @@ import (
 type (
 	userRepository interface {
 		CreateUser(user *models.User) error
+		GetByEmail(email string) (*models.User, error)
 	}
+
 	Registration struct {
 		userRepository
 	}
@@ -22,7 +24,7 @@ func NewUserRegistrationFeature(repo userRepository) *Registration {
 }
 
 func (r *Registration) Register(ctx context.Context, user *domain.User) (*domain.User, error) {
-	if err := user.HashPassword(user.Password); err != nil {
+	if err := user.ToDBModel().HashPassword(user.Password); err != nil {
 		logger.Errorf("error hashing password: %s", err.Error())
 		return nil, err
 	}

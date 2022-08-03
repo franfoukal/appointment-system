@@ -8,6 +8,8 @@ type (
 	LockedError         string
 	UnprocessableEntity string
 	Error               string
+	ForbiddenError      string
+	InternalServerError string
 
 	APIError struct {
 		ErrorStr string    `json:"error"`
@@ -23,6 +25,8 @@ type (
 )
 
 func (e EntityNotFoundError) Error() string { return string(e) }
+func (e InternalServerError) Error() string { return string(e) }
+func (e ForbiddenError) Error() string      { return string(e) }
 func (e ValidationError) Error() string     { return string(e) }
 func (e LockedError) Error() string         { return string(e) }
 func (e APIError) Error() string            { return e.ErrorStr }
@@ -35,6 +39,10 @@ func (e Error) Error() string               { return string(e) }
 
 func NotFoundAPIError(message string) APIError {
 	return APIError{"not_found", http.StatusNotFound, CauseList{message}}
+}
+
+func ForbiddenAPIError(message string) APIError {
+	return APIError{"forbidden", http.StatusForbidden, CauseList{message}}
 }
 
 func BadRequestAPIError(message string) APIError {

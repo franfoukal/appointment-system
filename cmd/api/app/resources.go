@@ -12,6 +12,7 @@ import (
 type (
 	Resources struct {
 		RegistrationFeature users.Registration
+		AuthFeature         users.Auth
 	}
 )
 
@@ -29,5 +30,6 @@ func BuildDependencies() *Resources {
 
 	return &Resources{
 		RegistrationFeature: *users.NewUserRegistrationFeature(userRepository),
+		AuthFeature:         *users.NewUserAuthFeature(userRepository),
 	}
 }
