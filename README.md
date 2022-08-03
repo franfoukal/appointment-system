@@ -2,15 +2,15 @@
 
 ## Initialize project
 
-* Configure environment variable `SCOPE=<SCOPE>` outside `.env` file
+* Configure environment variable `ENVIRONMENT=<SCOPE>` outside `.env` file
   * Example in sh
   
     ```sh
-    SCOPE=local \
+    ENVIRONMENT=local \
     go run ./cmd/api/main.go
     ```
-* Copy `local.env.example` file and change name for `<SCOPE>.env` and add environment variables
-  * Scopes: `TEST`, `LOCAL` or `PRODUCTION`
+* Copy `local.env.example` file and change name for `<ENVIRONMENT>.env` and add environment variables
+  * Environments: `TEST`, `LOCAL` or `PRODUCTION`
 
 * Create DB schema `appointments` before start the project
 
