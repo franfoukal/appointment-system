@@ -6,7 +6,7 @@
   * Example in sh
   
     ```sh
-    SCOPE=local \
+    ENVIRONMENT=local \
     go run ./cmd/api/main.go
     ```
 * Copy `local.env.example` file and change name for `<ENVIRONMENT>.env` and add environment variables
