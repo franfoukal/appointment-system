@@ -3,7 +3,6 @@ package domain
 import (
 	"github.com/labscool/mb-appointment-system/cmd/api/presenter"
 	"github.com/labscool/mb-appointment-system/db/models"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type (
@@ -13,6 +12,11 @@ type (
 		Username  string
 		Email     string
 		Password  string
+	}
+
+	TokenPayload struct {
+		Username string
+		Email    string
 	}
 )
 
@@ -33,21 +37,4 @@ func (u *User) ToPresenter() *presenter.Registration {
 		Username:  u.Username,
 		Email:     u.Email,
 	}
-}
-
-func (user *User) HashPassword(password string) error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	if err != nil {
-		return err
-	}
-	user.Password = string(bytes)
-	return nil
-}
-
-func (user *User) CheckPassword(providedPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
-	if err != nil {
-		return err
-	}
-	return nil
 }

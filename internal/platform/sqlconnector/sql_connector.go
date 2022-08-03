@@ -52,5 +52,5 @@ func buildConnection() string {
 	dbPassword := os.Getenv("DB_MYSQL_PASSWORD")
 	dbHost := os.Getenv("DB_MYSQL_HOST")
 	schemaName := os.Getenv("DB_MYSQL_SCHEMA_NAME")
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUsername, dbPassword, dbHost, schemaName)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUsername, dbPassword, dbHost, schemaName)
 }
