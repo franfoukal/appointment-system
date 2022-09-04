@@ -7,16 +7,20 @@ import (
 
 type (
 	User struct {
+		ID        uint
 		FirstName string
 		LastName  string
 		Username  string
 		Email     string
 		Password  string
+		Role      string
 	}
 
 	TokenPayload struct {
+		ID       uint
 		Username string
 		Email    string
+		Role     string
 	}
 )
 
@@ -27,6 +31,19 @@ func (u *User) ToDBModel() *models.User {
 		Username:  u.Username,
 		Email:     u.Email,
 		Password:  u.Password,
+		Role:      u.Role,
+	}
+}
+
+func UserFromDBModel(dbUser *models.User) *User {
+	return &User{
+		ID:        dbUser.ID,
+		FirstName: dbUser.FirstName,
+		LastName:  dbUser.LastName,
+		Username:  dbUser.Username,
+		Email:     dbUser.Email,
+		Password:  dbUser.Password,
+		Role:      dbUser.Role,
 	}
 }
 
@@ -36,5 +53,6 @@ func (u *User) ToPresenter() *presenter.Registration {
 		LastName:  u.LastName,
 		Username:  u.Username,
 		Email:     u.Email,
+		Role:      u.Role,
 	}
 }

@@ -10,7 +10,7 @@ import (
 
 type (
 	userRepository interface {
-		CreateUser(user *models.User) error
+		CreateUser(user *models.User) (*models.User, error)
 		GetByEmail(email string) (*models.User, error)
 	}
 
@@ -24,16 +24,17 @@ func NewUserRegistrationFeature(repo userRepository) *Registration {
 }
 
 func (r *Registration) Register(ctx context.Context, user *domain.User) (*domain.User, error) {
-	if err := user.ToDBModel().HashPassword(user.Password); err != nil {
+	userDBModel := user.ToDBModel()
+	if err := userDBModel.HashPassword(); err != nil {
 		logger.Errorf("error hashing password: %s", err.Error())
 		return nil, err
 	}
 
-	err := r.userRepository.CreateUser(user.ToDBModel())
+	userDB, err := r.userRepository.CreateUser(userDBModel)
 	if err != nil {
 		logger.Errorf("error saving new user to DB: %s", err.Error())
 		return nil, err
 	}
 
-	return user, nil
+	return domain.UserFromDBModel(userDB), nil
 }

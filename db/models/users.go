@@ -12,10 +12,17 @@ type User struct {
 	Username  string `json:"username" gorm:"unique"`
 	Email     string `json:"email" gorm:"unique"`
 	Password  string `json:"password"`
+	Role      string `json:"role" gorm:"-"`
 }
 
-func (user *User) HashPassword(password string) error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+type Role struct {
+	gorm.Model
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+func (user *User) HashPassword() error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
 		return err
 	}
