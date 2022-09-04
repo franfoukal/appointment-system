@@ -103,5 +103,6 @@ Temporary Items
 *.code-workspace
 
 *.env
+/docs
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,go,macos,git

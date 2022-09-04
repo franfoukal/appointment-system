@@ -18,12 +18,12 @@ func NewUserRepository() *UserRepository {
 	return &UserRepository{}
 }
 
-func (u *UserRepository) CreateUser(user *models.User) error {
-	record := orm.Instance.Create(user)
+func (u *UserRepository) CreateUser(user *models.User) (*models.User, error) {
+	record := orm.Instance.Create(&user)
 	if record.Error != nil {
-		return fmt.Errorf("error saving user into db: %s", record.Error)
+		return nil, fmt.Errorf("error saving user into db: %s", record.Error)
 	}
-	return nil
+	return user, nil
 }
 
 func (u *UserRepository) GetByEmail(email string) (*models.User, error) {

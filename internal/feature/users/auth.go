@@ -13,8 +13,10 @@ import (
 
 type (
 	JWTClaim struct {
+		ID       uint   `json:"id"`
 		Username string `json:"username"`
 		Email    string `json:"email"`
+		Role     string `json:"role"`
 		jwt.StandardClaims
 	}
 
@@ -37,6 +39,7 @@ func (a *Auth) Authenticate(email, password string) (string, error) {
 
 	payload := domain.TokenPayload{
 		Username: user.Username,
+		ID:       user.ID,
 		Email:    user.Email,
 	}
 
@@ -51,6 +54,8 @@ func (a *Auth) Authenticate(email, password string) (string, error) {
 func (a *Auth) generateToken(payload domain.TokenPayload) (string, error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &JWTClaim{
+		ID:       payload.ID,
+		Role:     payload.Role,
 		Username: payload.Username,
 		Email:    payload.Email,
 		StandardClaims: jwt.StandardClaims{
@@ -62,7 +67,7 @@ func (a *Auth) generateToken(payload domain.TokenPayload) (string, error) {
 	return token.SignedString(JWTKey)
 }
 
-func (a *Auth) ValidateToken(signedToken string) (err error) {
+func ValidateToken(signedToken string) (*jwt.Token, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
@@ -71,18 +76,18 @@ func (a *Auth) ValidateToken(signedToken string) (err error) {
 		},
 	)
 	if err != nil {
-		return
+		return nil, err
 	}
 	claims, ok := token.Claims.(*JWTClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
-		return
+		return nil, err
 	}
 	if claims.ExpiresAt < time.Now().Local().Unix() {
 		err = errors.New("token expired")
-		return
+		return nil, err
 	}
-	return
+	return token, nil
 }
 
 func (a *Auth) checkCredentials(email, password string) (*models.User, error) {
