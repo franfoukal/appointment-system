@@ -24,7 +24,13 @@ func Connect(db *sql.DB) {
 	}
 	log.Println("Connected to Database!")
 }
-func Migrate() {
+func DevelopmentMigrations() {
+	// MIGRATIONS
+	// Don`t delete migrations, modified on-demand to track changes and clean up in production ones
 	Instance.AutoMigrate(&models.User{})
+	Instance.AutoMigrate(&models.Service{})
+
 	logger.Infof("Database Migration Completed!")
 }
+
+func ProductionMigrations() {}

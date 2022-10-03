@@ -16,7 +16,7 @@ type (
 )
 
 var (
-	EnvironmentType = environmentType{
+	Type = environmentType{
 		Test:       Environment("test"),
 		Local:      Environment("local"),
 		Production: Environment("production"),
@@ -30,13 +30,13 @@ func (env Environment) String() string {
 func Get() Environment {
 	env := os.Getenv("ENVIRONMENT")
 	switch strings.ToLower(env) {
-	case EnvironmentType.Local.String():
-		return EnvironmentType.Local
-	case EnvironmentType.Test.String():
-		return EnvironmentType.Test
-	case EnvironmentType.Production.String():
-		return EnvironmentType.Production
+	case Type.Local.String():
+		return Type.Local
+	case Type.Test.String():
+		return Type.Test
+	case Type.Production.String():
+		return Type.Production
 	default:
-		return EnvironmentType.Local
+		return Type.Local
 	}
 }

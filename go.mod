@@ -1,9 +1,8 @@
 module github.com/labscool/mb-appointment-system
 
-go 1.18
+go 1.19
 
 require (
-	github.com/casbin/casbin v1.9.1
 	github.com/casbin/casbin/v2 v2.51.2
 	github.com/casbin/gorm-adapter/v3 v3.7.4
 	github.com/gin-gonic/gin v1.8.1
@@ -25,7 +24,7 @@ require (
 	github.com/glebarez/sqlite v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/go-playground/validator/v10 v10.10.0 // indirect
+	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.0.0-20170517235910-f1bb20e5a188 // indirect
