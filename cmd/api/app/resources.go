@@ -8,18 +8,23 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/labscool/mb-appointment-system/cmd/api/app/handlers/auth"
+	"github.com/labscool/mb-appointment-system/cmd/api/app/handlers/registration"
+	service_handler "github.com/labscool/mb-appointment-system/cmd/api/app/handlers/services"
 	"github.com/labscool/mb-appointment-system/internal/environment"
+	"github.com/labscool/mb-appointment-system/internal/feature/services"
 	"github.com/labscool/mb-appointment-system/internal/feature/users"
 	"github.com/labscool/mb-appointment-system/internal/platform/orm"
 	"github.com/labscool/mb-appointment-system/internal/platform/sqlconnector"
-	repository "github.com/labscool/mb-appointment-system/internal/repository/users"
+	"github.com/labscool/mb-appointment-system/internal/repository"
 )
 
 type (
 	Resources struct {
 		Enforcer            casbin.Enforcer
-		RegistrationFeature users.Registration
-		AuthFeature         users.Auth
+		AuthHandler         auth.AuthHandler
+		RegistrationHandler registration.RegistrationHandler
+		ServiceHandler      service_handler.ServiceHandler
 	}
 )
 
@@ -37,19 +42,27 @@ func BuildDependencies() *Resources {
 	var enforcer *casbin.Enforcer
 
 	switch environment.Get() {
-	case environment.EnvironmentType.Local:
+	case environment.Type.Local:
 		db, _ = sqlconnector.InitDBLocalConnection()
 		orm.Connect(db)
-		orm.Migrate()
+		orm.DevelopmentMigrations()
 		enforcer = configureEnforcer()
 	}
 
+	// Repositories
 	userRepository := repository.NewUserRepository()
+	serviceRepository := repository.NewServiceRepository()
+
+	// Features
+	authFeature := users.NewUserAuthFeature(userRepository)
+	registrationFeature := users.NewUserRegistrationFeature(userRepository)
+	serviceFeature := services.NewServiceFeature(serviceRepository)
 
 	return &Resources{
 		Enforcer:            *enforcer,
-		RegistrationFeature: *users.NewUserRegistrationFeature(userRepository),
-		AuthFeature:         *users.NewUserAuthFeature(userRepository),
+		AuthHandler:         *auth.NewTokenHandler(*authFeature),
+		RegistrationHandler: *registration.NewRegistrationHandler(*registrationFeature),
+		ServiceHandler:      *service_handler.NewServiceHandler(serviceFeature),
 	}
 }
 

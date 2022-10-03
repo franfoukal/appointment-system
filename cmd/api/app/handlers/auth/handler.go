@@ -29,7 +29,7 @@ func (a *AuthHandler) GenerateToken(c *gin.Context) {
 
 	token, err := a.feature.Authenticate(request.Email, request.Password)
 	if _, ok := err.(customerror.EntityNotFoundError); ok {
-		c.JSON(http.StatusNotFound, customerror.NotFoundAPIError("There are no user with this email"))
+		c.JSON(http.StatusNotFound, customerror.NotFoundAPIError("There are no user with the provided email"))
 		return
 	}
 
