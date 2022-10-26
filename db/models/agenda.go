@@ -10,8 +10,8 @@ import (
 type (
 	Agenda struct {
 		gorm.Model
-		UserID  uint
-		Date    time.Time
+		UserID  uint      `gorm:"index:idx_user_date"`
+		Date    time.Time `gorm:"index:idx_user_date"`
 		Details datatypes.JSON
 	}
 )

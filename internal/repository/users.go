@@ -40,3 +40,18 @@ func (u *UserRepository) GetByEmail(email string) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (u *UserRepository) GetByID(id uint) (*models.User, error) {
+	var user models.User
+	record := orm.Instance.First(&user, id)
+
+	if errors.Is(record.Error, gorm.ErrRecordNotFound) {
+		return nil, customerror.EntityNotFoundError(fmt.Sprintf("user with ID: %d not found", id))
+	}
+
+	if record.Error != nil {
+		return nil, customerror.InternalServerAPIError("error getting user from database")
+	}
+
+	return &user, nil
+}
