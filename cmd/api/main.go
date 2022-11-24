@@ -21,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	resources := app.BuildDependencies()
+	resources := app.BuildDependencies(cfg)
 
 	// DEBUG
 	env := environment.Get()
