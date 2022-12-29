@@ -29,6 +29,7 @@ func DevelopmentMigrations() {
 	// Don`t delete migrations, modified on-demand to track changes and clean up in production ones
 	Instance.AutoMigrate(&models.User{})
 	Instance.AutoMigrate(&models.Service{})
+	Instance.AutoMigrate(&models.Agenda{})
 
 	logger.Infof("Database Migration Completed!")
 }

@@ -15,9 +15,16 @@ const ymlExtension = ".yml"
 //go:embed *.yml
 var configFiles embed.FS
 
-type Config struct {
-	AppName string `yaml:"app-name"`
-}
+type (
+	Config struct {
+		AppName   string    `yaml:"app-name"`
+		KVSConfig KVSConfig `yaml:"kvs-config"`
+	}
+
+	KVSConfig struct {
+		Address string `yaml:"address"`
+	}
+)
 
 func LoadConfiguration() (Config, error) {
 	filepath := loadFilePath()

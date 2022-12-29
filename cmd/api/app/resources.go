@@ -8,12 +8,16 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	agenda_handler "github.com/labscool/mb-appointment-system/cmd/api/app/handlers/agenda"
 	"github.com/labscool/mb-appointment-system/cmd/api/app/handlers/auth"
 	"github.com/labscool/mb-appointment-system/cmd/api/app/handlers/registration"
 	service_handler "github.com/labscool/mb-appointment-system/cmd/api/app/handlers/services"
+	"github.com/labscool/mb-appointment-system/config"
 	"github.com/labscool/mb-appointment-system/internal/environment"
+	"github.com/labscool/mb-appointment-system/internal/feature/agenda"
 	"github.com/labscool/mb-appointment-system/internal/feature/services"
 	"github.com/labscool/mb-appointment-system/internal/feature/users"
+	"github.com/labscool/mb-appointment-system/internal/platform/kvs"
 	"github.com/labscool/mb-appointment-system/internal/platform/orm"
 	"github.com/labscool/mb-appointment-system/internal/platform/sqlconnector"
 	"github.com/labscool/mb-appointment-system/internal/repository"
@@ -25,6 +29,7 @@ type (
 		AuthHandler         auth.AuthHandler
 		RegistrationHandler registration.RegistrationHandler
 		ServiceHandler      service_handler.ServiceHandler
+		AgendaHandler       agenda_handler.AgendaHandler
 	}
 )
 
@@ -36,7 +41,7 @@ var (
 	projectRootPath = filepath.Join(filepath.Dir(b), "../../../")
 )
 
-func BuildDependencies() *Resources {
+func BuildDependencies(cfg config.Config) *Resources {
 
 	var db *sql.DB
 	var enforcer *casbin.Enforcer
@@ -52,17 +57,26 @@ func BuildDependencies() *Resources {
 	// Repositories
 	userRepository := repository.NewUserRepository()
 	serviceRepository := repository.NewServiceRepository()
+	agendaRepository := repository.NewAgendaRepository()
+
+	// Clients
+	kvsClient, err := kvs.NewClient(cfg.KVSConfig.Address)
+	if err != nil {
+		panic(err)
+	}
 
 	// Features
 	authFeature := users.NewUserAuthFeature(userRepository)
 	registrationFeature := users.NewUserRegistrationFeature(userRepository)
 	serviceFeature := services.NewServiceFeature(serviceRepository)
+	agendaFeature := agenda.NewAgendaFeature(agendaRepository, serviceRepository, userRepository, kvsClient)
 
 	return &Resources{
 		Enforcer:            *enforcer,
 		AuthHandler:         *auth.NewTokenHandler(*authFeature),
 		RegistrationHandler: *registration.NewRegistrationHandler(*registrationFeature),
 		ServiceHandler:      *service_handler.NewServiceHandler(serviceFeature),
+		AgendaHandler:       *agenda_handler.NewAgendaHandler(agendaFeature),
 	}
 }
 

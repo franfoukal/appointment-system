@@ -94,3 +94,18 @@ func (s *ServiceRepository) GetServiceByID(serviceID uint) (*models.Service, err
 
 	return service, nil
 }
+
+func (s *ServiceRepository) MGetServiceByID(serviceIDs []int) ([]*models.Service, error) {
+	var services []*models.Service
+	result := orm.Instance.Find(&services, serviceIDs)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, customerror.EntityNotFoundError("service not found")
+	}
+
+	if result.Error != nil {
+		return nil, customerror.InternalServerAPIError("error getting services from database")
+	}
+
+	return services, nil
+}
