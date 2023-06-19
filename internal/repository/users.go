@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/labscool/mb-appointment-system/db/models"
+	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
 	"github.com/labscool/mb-appointment-system/internal/platform/orm"
 	"gorm.io/gorm"
@@ -18,7 +19,7 @@ func NewUserRepository() *UserRepository {
 	return &UserRepository{}
 }
 
-func (u *UserRepository) CreateUser(user *models.User) (*models.User, error) {
+func (u *UserRepository) CreateUser(user *domain.User) (*domain.User, error) {
 	record := orm.Instance.Create(&user)
 	if record.Error != nil {
 		return nil, fmt.Errorf("error saving user into db: %s", record.Error)
@@ -26,7 +27,7 @@ func (u *UserRepository) CreateUser(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func (u *UserRepository) GetByEmail(email string) (*models.User, error) {
+func (u *UserRepository) GetByEmail(email string) (*domain.User, error) {
 	var user models.User
 	record := orm.Instance.Where("email = ?", email).First(&user)
 
@@ -38,10 +39,10 @@ func (u *UserRepository) GetByEmail(email string) (*models.User, error) {
 		return nil, customerror.InternalServerAPIError("error getting user from database")
 	}
 
-	return &user, nil
+	return user.ToDomain(), nil
 }
 
-func (u *UserRepository) GetByID(id uint) (*models.User, error) {
+func (u *UserRepository) GetByID(id uint) (*domain.User, error) {
 	var user models.User
 	record := orm.Instance.First(&user, id)
 
@@ -53,5 +54,5 @@ func (u *UserRepository) GetByID(id uint) (*models.User, error) {
 		return nil, customerror.InternalServerAPIError("error getting user from database")
 	}
 
-	return &user, nil
+	return user.ToDomain(), nil
 }

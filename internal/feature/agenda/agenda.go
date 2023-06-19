@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	"golang.org/x/exp/maps"
 )
@@ -16,11 +15,11 @@ type (
 	}
 
 	serviceRepository interface {
-		MGetServiceByID(serviceIDs []int) ([]*models.Service, error)
+		MGetServiceByID(serviceIDs []int) ([]*domain.Service, error)
 	}
 
 	userRepository interface {
-		GetByID(id uint) (*models.User, error)
+		GetByID(id uint) (*domain.User, error)
 	}
 	kvsClient interface {
 		Set(key string, value interface{}, expiration_min int64) error
@@ -73,7 +72,7 @@ func (a *AgendaFeature) CreateAgenda(ctx context.Context, agenda *domain.Agenda)
 		return nil, err
 	}
 
-	if err := a.createTimeslots(agenda, user.ToDomain()); err != nil {
+	if err := a.createTimeslots(agenda, user); err != nil {
 		return nil, err
 	}
 
