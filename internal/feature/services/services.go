@@ -29,13 +29,13 @@ func NewServiceFeature(repository serviceRepository) *ServiceFeature {
 }
 
 func (s *ServiceFeature) CreateService(ctx context.Context, newService *domain.Service) (*domain.Service, error) {
-	service, err := s.repository.CreateService(newService.ToDBModel())
+	service, err := s.repository.CreateService(models.ServiceModelFromDomain(newService))
 	if err != nil {
 		logger.Errorf("error saving new service into DB: %s", err.Error())
 		return nil, err
 	}
 
-	return domain.ServiceFromDBModel(service), nil
+	return service.ToDomain(), nil
 }
 
 func (s *ServiceFeature) GetServices(ctx context.Context) ([]*domain.Service, error) {
@@ -46,20 +46,20 @@ func (s *ServiceFeature) GetServices(ctx context.Context) ([]*domain.Service, er
 	}
 
 	var services []*domain.Service
-	for _, ss := range serviceList {
-		services = append(services, domain.ServiceFromDBModel(ss))
+	for _, service := range serviceList {
+		services = append(services, service.ToDomain())
 	}
 
 	return services, nil
 }
 
 func (s *ServiceFeature) UpdateService(ctx context.Context, serviceID uint, serviceToUpdate *domain.Service) (*domain.Service, error) {
-	service, err := s.repository.UpdateService(serviceID, serviceToUpdate.ToDBModel())
+	service, err := s.repository.UpdateService(serviceID, models.ServiceModelFromDomain(serviceToUpdate))
 	if err != nil {
 		logger.Errorf("error updating service into DB: %s", err.Error())
 		return nil, err
 	}
-	return domain.ServiceFromDBModel(service), nil
+	return service.ToDomain(), nil
 }
 
 func (s *ServiceFeature) DeleteService(ctx context.Context, serviceID uint) error {

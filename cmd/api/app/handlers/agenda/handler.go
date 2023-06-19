@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/labscool/mb-appointment-system/cmd/api/presenter"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
 	"github.com/labscool/mb-appointment-system/internal/platform/logger"
@@ -57,6 +58,6 @@ func (a *AgendaHandler) CreateAgenda() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, agenda.ToPresenter())
+		c.JSON(http.StatusCreated, presenter.AgendaFromDomain(agenda))
 	}
 }

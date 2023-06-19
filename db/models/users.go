@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/labscool/mb-appointment-system/internal/domain"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -36,4 +37,27 @@ func (user *User) CheckPassword(providedPassword string) error {
 		return err
 	}
 	return nil
+}
+
+func UserModelFromDomain(user *domain.User) *User {
+	return &User{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Username:  user.Username,
+		Email:     user.Email,
+		Password:  user.Password,
+		Role:      user.Role,
+	}
+}
+
+func (u *User) ToDomain() *domain.User {
+	return &domain.User{
+		ID:        u.ID,
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+		Username:  u.Username,
+		Email:     u.Email,
+		Password:  u.Password,
+		Role:      u.Role,
+	}
 }

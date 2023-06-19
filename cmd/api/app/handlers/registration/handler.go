@@ -7,6 +7,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/labscool/mb-appointment-system/cmd/api/presenter"
 	"github.com/labscool/mb-appointment-system/internal/feature/users"
 	"github.com/labscool/mb-appointment-system/internal/platform/logger"
 )
@@ -42,6 +43,6 @@ func (r *RegistrationHandler) RegisterUser(enforcer *casbin.Enforcer) gin.Handle
 
 		enforcer.AddGroupingPolicy(fmt.Sprint(newUser.Username), newUser.Role)
 
-		c.JSON(http.StatusCreated, newUser.ToPresenter())
+		c.JSON(http.StatusCreated, presenter.UserFromDomain(newUser))
 	}
 }

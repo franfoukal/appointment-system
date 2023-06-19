@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 
+	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
 	"github.com/labscool/mb-appointment-system/internal/platform/orm"
@@ -15,7 +16,7 @@ func NewAgendaRepository() *AgendaRepository {
 }
 
 func (a *AgendaRepository) CreateAgenda(agenda *domain.Agenda) (*domain.Agenda, error) {
-	model, err := agenda.ToDBModel()
+	model, err := models.AgendaModelFromDomain(agenda)
 	if err != nil {
 		errStr := fmt.Sprintf("error saving agenda into db: %s", err.Error())
 		return nil, customerror.InternalServerError(errStr)
@@ -26,7 +27,7 @@ func (a *AgendaRepository) CreateAgenda(agenda *domain.Agenda) (*domain.Agenda, 
 		return nil, customerror.InternalServerError(fmt.Sprintf("error saving agenda into db: %s", record.Error))
 	}
 
-	agendaResult, err := domain.AgendaFromDBModel(model)
+	agendaResult, err := model.ToDomain()
 	if err != nil {
 		return nil, err
 	}

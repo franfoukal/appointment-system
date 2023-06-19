@@ -73,7 +73,7 @@ func (a *AgendaFeature) CreateAgenda(ctx context.Context, agenda *domain.Agenda)
 		return nil, err
 	}
 
-	if err := a.createTimeslots(agenda, domain.UserFromDBModel(user)); err != nil {
+	if err := a.createTimeslots(agenda, user.ToDomain()); err != nil {
 		return nil, err
 	}
 

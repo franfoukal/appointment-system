@@ -1,5 +1,7 @@
 package presenter
 
+import "github.com/labscool/mb-appointment-system/internal/domain"
+
 type (
 	Registration struct {
 		FirstName string `json:"first_name"`
@@ -13,3 +15,13 @@ type (
 		JWT string `json:"token"`
 	}
 )
+
+func UserFromDomain(user *domain.User) *Registration {
+	return &Registration{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Username:  user.Username,
+		Email:     user.Email,
+		Role:      user.Role,
+	}
+}
