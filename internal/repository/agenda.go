@@ -6,13 +6,17 @@ import (
 	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
-	"github.com/labscool/mb-appointment-system/internal/platform/orm"
+	"gorm.io/gorm"
 )
 
-type AgendaRepository struct{}
+type AgendaRepository struct {
+	db *gorm.DB
+}
 
-func NewAgendaRepository() *AgendaRepository {
-	return &AgendaRepository{}
+func NewAgendaRepository(db *gorm.DB) *AgendaRepository {
+	return &AgendaRepository{
+		db: db,
+	}
 }
 
 func (a *AgendaRepository) CreateAgenda(agenda *domain.Agenda) (*domain.Agenda, error) {
@@ -22,7 +26,7 @@ func (a *AgendaRepository) CreateAgenda(agenda *domain.Agenda) (*domain.Agenda, 
 		return nil, customerror.InternalServerError(errStr)
 	}
 
-	record := orm.Instance.Create(&model)
+	record := a.db.Create(&model)
 	if record.Error != nil {
 		return nil, customerror.InternalServerError(fmt.Sprintf("error saving agenda into db: %s", record.Error))
 	}

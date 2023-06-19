@@ -1,4 +1,4 @@
-package orm
+package database
 
 import (
 	"database/sql"
@@ -10,28 +10,35 @@ import (
 	"gorm.io/gorm"
 )
 
-var Instance *gorm.DB
-var dbError error
+type GORMInstance struct {
+	*gorm.DB
+}
 
-func Connect(db *sql.DB) {
-	Instance, dbError = gorm.Open(mysql.New(mysql.Config{
+func NewGormInstance(db *sql.DB) GORMInstance {
+	instance, err := gorm.Open(mysql.New(mysql.Config{
 		Conn: db,
 	}), &gorm.Config{})
 
-	if dbError != nil {
-		logger.Fatalf("%s", dbError)
+	if err != nil {
+		logger.Fatalf("%s", err)
 		panic("Cannot connect to DB")
 	}
+
 	log.Println("Connected to Database!")
+
+	return GORMInstance{
+		DB: instance,
+	}
 }
-func DevelopmentMigrations() {
+
+func (i GORMInstance) DevelopmentMigrations() {
 	// MIGRATIONS
 	// Don`t delete migrations, modified on-demand to track changes and clean up in production ones
-	Instance.AutoMigrate(&models.User{})
-	Instance.AutoMigrate(&models.Service{})
-	Instance.AutoMigrate(&models.Agenda{})
+	i.AutoMigrate(&models.User{})
+	i.AutoMigrate(&models.Service{})
+	i.AutoMigrate(&models.Agenda{})
 
 	logger.Infof("Database Migration Completed!")
 }
 
-func ProductionMigrations() {}
+func (i GORMInstance) ProductionMigrations() {}
