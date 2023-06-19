@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
 )
@@ -90,13 +89,13 @@ func ValidateToken(signedToken string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func (a *Auth) checkCredentials(email, password string) (*models.User, error) {
+func (a *Auth) checkCredentials(email, password string) (*domain.User, error) {
 	user, err := a.userRepository.GetByEmail(email)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := user.CheckPassword(password); err != nil {
+	if err := user.CheckPassword(password); err != nil { // TODO:
 		return nil, customerror.ForbiddenError("invalid password")
 	}
 

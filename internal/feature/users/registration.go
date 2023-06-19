@@ -3,15 +3,14 @@ package users
 import (
 	"context"
 
-	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	"github.com/labscool/mb-appointment-system/internal/platform/logger"
 )
 
 type (
 	userRepository interface {
-		CreateUser(user *models.User) (*models.User, error)
-		GetByEmail(email string) (*models.User, error)
+		CreateUser(user *domain.User) (*domain.User, error)
+		GetByEmail(email string) (*domain.User, error)
 	}
 
 	Registration struct {
@@ -24,17 +23,16 @@ func NewUserRegistrationFeature(repo userRepository) *Registration {
 }
 
 func (r *Registration) Register(ctx context.Context, user *domain.User) (*domain.User, error) {
-	userDBModel := models.UserModelFromDomain(user)
-	if err := userDBModel.HashPassword(); err != nil {
+	if err := user.HashPassword(); err != nil {
 		logger.Errorf("error hashing password: %s", err.Error())
 		return nil, err
 	}
 
-	userDB, err := r.userRepository.CreateUser(userDBModel)
+	createdUser, err := r.userRepository.CreateUser(user)
 	if err != nil {
 		logger.Errorf("error saving new user to DB: %s", err.Error())
 		return nil, err
 	}
 
-	return userDB.ToDomain(), nil
+	return createdUser, nil
 }

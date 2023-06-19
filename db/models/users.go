@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/labscool/mb-appointment-system/internal/domain"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -20,23 +19,6 @@ type Role struct {
 	gorm.Model
 	Name        string `json:"name"`
 	Description string `json:"description"`
-}
-
-func (user *User) HashPassword() error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	if err != nil {
-		return err
-	}
-	user.Password = string(bytes)
-	return nil
-}
-
-func (user *User) CheckPassword(providedPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func UserModelFromDomain(user *domain.User) *User {
