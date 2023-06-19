@@ -7,21 +7,24 @@ import (
 	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
-	"github.com/labscool/mb-appointment-system/internal/platform/orm"
 	"gorm.io/gorm"
 )
 
 type (
-	ServiceRepository struct{}
+	ServiceRepository struct {
+		db *gorm.DB
+	}
 )
 
-func NewServiceRepository() *ServiceRepository {
-	return &ServiceRepository{}
+func NewServiceRepository(db *gorm.DB) *ServiceRepository {
+	return &ServiceRepository{
+		db: db,
+	}
 }
 
 func (s *ServiceRepository) CreateService(service *domain.Service) (*domain.Service, error) {
 	serviceDBEntity := models.ServiceModelFromDomain(service)
-	record := orm.Instance.Create(&serviceDBEntity)
+	record := s.db.Create(&serviceDBEntity)
 	if record.Error != nil {
 		return nil, fmt.Errorf("error saving service into db: %s", record.Error)
 	}
@@ -31,7 +34,7 @@ func (s *ServiceRepository) CreateService(service *domain.Service) (*domain.Serv
 
 func (s *ServiceRepository) GetServices() ([]*domain.Service, error) {
 	var servicesDB []*models.Service
-	result := orm.Instance.Find(&servicesDB)
+	result := s.db.Find(&servicesDB)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, customerror.EntityNotFoundError("servce not found")
@@ -60,7 +63,7 @@ func (s *ServiceRepository) UpdateService(serviceID uint, serviceToUpdate *domai
 	service.Description = serviceToUpdate.Description
 	service.ImageURL = serviceToUpdate.ImageURL
 
-	record := orm.Instance.Save(models.ServiceModelFromDomain(service))
+	record := s.db.Save(models.ServiceModelFromDomain(service))
 	if errors.Is(record.Error, gorm.ErrRecordNotFound) {
 		return nil, customerror.EntityNotFoundError("servce not found")
 	}
@@ -76,7 +79,7 @@ func (s *ServiceRepository) DeleteService(serviceID uint) error {
 	if err != nil {
 		return err
 	}
-	record := orm.Instance.Delete(models.ServiceModelFromDomain(service))
+	record := s.db.Delete(models.ServiceModelFromDomain(service))
 	if record.Error != nil {
 		if errors.Is(record.Error, gorm.ErrRecordNotFound) {
 			return customerror.EntityNotFoundError("service not found")
@@ -89,7 +92,7 @@ func (s *ServiceRepository) DeleteService(serviceID uint) error {
 
 func (s *ServiceRepository) GetServiceByID(serviceID uint) (*domain.Service, error) {
 	var service *models.Service
-	result := orm.Instance.First(&service, serviceID)
+	result := s.db.First(&service, serviceID)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, customerror.EntityNotFoundError("service not found")
@@ -104,7 +107,7 @@ func (s *ServiceRepository) GetServiceByID(serviceID uint) (*domain.Service, err
 
 func (s *ServiceRepository) MGetServiceByID(serviceIDs []int) ([]*domain.Service, error) {
 	var foundServices []*models.Service
-	result := orm.Instance.Find(&foundServices, serviceIDs)
+	result := s.db.Find(&foundServices, serviceIDs)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, customerror.EntityNotFoundError("service not found")

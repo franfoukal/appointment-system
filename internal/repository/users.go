@@ -7,20 +7,23 @@ import (
 	"github.com/labscool/mb-appointment-system/db/models"
 	"github.com/labscool/mb-appointment-system/internal/domain"
 	customerror "github.com/labscool/mb-appointment-system/internal/feature/custom"
-	"github.com/labscool/mb-appointment-system/internal/platform/orm"
 	"gorm.io/gorm"
 )
 
 type (
-	UserRepository struct{}
+	UserRepository struct {
+		db *gorm.DB
+	}
 )
 
-func NewUserRepository() *UserRepository {
-	return &UserRepository{}
+func NewUserRepository(db *gorm.DB) *UserRepository {
+	return &UserRepository{
+		db: db,
+	}
 }
 
 func (u *UserRepository) CreateUser(user *domain.User) (*domain.User, error) {
-	record := orm.Instance.Create(&user)
+	record := u.db.Create(&user)
 	if record.Error != nil {
 		return nil, fmt.Errorf("error saving user into db: %s", record.Error)
 	}
@@ -29,7 +32,7 @@ func (u *UserRepository) CreateUser(user *domain.User) (*domain.User, error) {
 
 func (u *UserRepository) GetByEmail(email string) (*domain.User, error) {
 	var user models.User
-	record := orm.Instance.Where("email = ?", email).First(&user)
+	record := u.db.Where("email = ?", email).First(&user)
 
 	if errors.Is(record.Error, gorm.ErrRecordNotFound) {
 		return nil, customerror.EntityNotFoundError("user not found")
@@ -44,7 +47,7 @@ func (u *UserRepository) GetByEmail(email string) (*domain.User, error) {
 
 func (u *UserRepository) GetByID(id uint) (*domain.User, error) {
 	var user models.User
-	record := orm.Instance.First(&user, id)
+	record := u.db.First(&user, id)
 
 	if errors.Is(record.Error, gorm.ErrRecordNotFound) {
 		return nil, customerror.EntityNotFoundError(fmt.Sprintf("user with ID: %d not found", id))

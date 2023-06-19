@@ -17,10 +17,11 @@ import (
 	"github.com/labscool/mb-appointment-system/internal/feature/agenda"
 	"github.com/labscool/mb-appointment-system/internal/feature/services"
 	"github.com/labscool/mb-appointment-system/internal/feature/users"
+	"github.com/labscool/mb-appointment-system/internal/platform/database"
 	"github.com/labscool/mb-appointment-system/internal/platform/kvs"
-	"github.com/labscool/mb-appointment-system/internal/platform/orm"
 	"github.com/labscool/mb-appointment-system/internal/platform/sqlconnector"
 	"github.com/labscool/mb-appointment-system/internal/repository"
+	"gorm.io/gorm"
 )
 
 type (
@@ -45,19 +46,20 @@ func BuildDependencies(cfg config.Config) *Resources {
 
 	var db *sql.DB
 	var enforcer *casbin.Enforcer
+	var GORMInstance database.GORMInstance
 
 	switch environment.Get() {
 	case environment.Type.Local:
 		db, _ = sqlconnector.InitDBLocalConnection()
-		orm.Connect(db)
-		orm.DevelopmentMigrations()
-		enforcer = configureEnforcer()
+		GORMInstance = database.NewGormInstance(db)
+		GORMInstance.DevelopmentMigrations()
+		enforcer = configureEnforcer(GORMInstance.DB)
 	}
 
 	// Repositories
-	userRepository := repository.NewUserRepository()
-	serviceRepository := repository.NewServiceRepository()
-	agendaRepository := repository.NewAgendaRepository()
+	userRepository := repository.NewUserRepository(GORMInstance.DB)
+	serviceRepository := repository.NewServiceRepository(GORMInstance.DB)
+	agendaRepository := repository.NewAgendaRepository(GORMInstance.DB)
 
 	// Clients
 	kvsClient, err := kvs.NewClient(cfg.KVSConfig.Address)
@@ -80,9 +82,9 @@ func BuildDependencies(cfg config.Config) *Resources {
 	}
 }
 
-func configureEnforcer() *casbin.Enforcer {
+func configureEnforcer(ORMInstance *gorm.DB) *casbin.Enforcer {
 	// Initialize  casbin adapter
-	adapter, err := gormadapter.NewAdapterByDB(orm.Instance)
+	adapter, err := gormadapter.NewAdapterByDB(ORMInstance)
 	if err != nil {
 		panic(fmt.Sprintf("failed to initialize casbin adapter: %v", err))
 	}
