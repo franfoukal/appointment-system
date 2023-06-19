@@ -52,7 +52,7 @@ func (s *ServiceHandler) CreateService() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, svc.ToPresenter())
+		c.JSON(http.StatusOK, presenter.ServiceFromDomain(svc))
 	}
 }
 
@@ -68,7 +68,7 @@ func (s *ServiceHandler) GetServices() gin.HandlerFunc {
 
 		services := make([]presenter.Service, 0)
 		for _, ss := range servicesDomain {
-			services = append(services, ss.ToPresenter())
+			services = append(services, presenter.ServiceFromDomain(ss))
 		}
 
 		c.JSON(http.StatusOK, services)
@@ -109,7 +109,7 @@ func (s *ServiceHandler) UpdateService() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, svc.ToPresenter())
+		c.JSON(http.StatusOK, presenter.ServiceFromDomain(svc))
 	}
 }
 

@@ -33,10 +33,6 @@ func (e APIError) Error() string            { return e.ErrorStr }
 func (e UnprocessableEntity) Error() string { return string(e) }
 func (e Error) Error() string               { return string(e) }
 
-// func Error()[T InternalUsageErrors] (t T) string {return string(t)}
-
-// TODO: implements generics
-
 func NotFoundAPIError(message string) APIError {
 	return APIError{"not_found", http.StatusNotFound, CauseList{message}}
 }

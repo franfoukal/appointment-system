@@ -24,7 +24,7 @@ func NewUserRegistrationFeature(repo userRepository) *Registration {
 }
 
 func (r *Registration) Register(ctx context.Context, user *domain.User) (*domain.User, error) {
-	userDBModel := user.ToDBModel()
+	userDBModel := models.UserModelFromDomain(user)
 	if err := userDBModel.HashPassword(); err != nil {
 		logger.Errorf("error hashing password: %s", err.Error())
 		return nil, err
@@ -36,5 +36,5 @@ func (r *Registration) Register(ctx context.Context, user *domain.User) (*domain
 		return nil, err
 	}
 
-	return domain.UserFromDBModel(userDB), nil
+	return userDB.ToDomain(), nil
 }
