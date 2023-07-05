@@ -31,7 +31,6 @@ func NewServiceHandler(manager ServiceManager) *ServiceHandler {
 
 func (s *ServiceHandler) CreateService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.Background()
 		var svcRequest ServiceRequest
 		if err := c.ShouldBindJSON(&svcRequest); err != nil {
 			logger.Errorf(err.Error())
@@ -46,7 +45,7 @@ func (s *ServiceHandler) CreateService() gin.HandlerFunc {
 			return
 		}
 
-		svc, err := s.manager.CreateService(ctx, svcRequest.ToDomain())
+		svc, err := s.manager.CreateService(c, svcRequest.ToDomain())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, customerror.InternalServerAPIError(err.Error()))
 			return
@@ -58,9 +57,7 @@ func (s *ServiceHandler) CreateService() gin.HandlerFunc {
 
 func (s *ServiceHandler) GetServices() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.Background()
-
-		servicesDomain, err := s.manager.GetServices(ctx)
+		servicesDomain, err := s.manager.GetServices(c)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, customerror.InternalServerAPIError(err.Error()))
 			return
@@ -77,7 +74,6 @@ func (s *ServiceHandler) GetServices() gin.HandlerFunc {
 
 func (s *ServiceHandler) UpdateService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.Background()
 		var svcRequest ServiceRequest
 		if err := c.ShouldBindJSON(&svcRequest); err != nil {
 			logger.Errorf(err.Error())
@@ -99,7 +95,7 @@ func (s *ServiceHandler) UpdateService() gin.HandlerFunc {
 			return
 		}
 
-		svc, err := s.manager.UpdateService(ctx, uint(id), svcRequest.ToDomain())
+		svc, err := s.manager.UpdateService(c, uint(id), svcRequest.ToDomain())
 		if _, ok := err.(customerror.EntityNotFoundError); ok {
 			c.JSON(http.StatusNotFound, customerror.NotFoundAPIError("There is not service with the id provided"))
 			return
@@ -115,7 +111,6 @@ func (s *ServiceHandler) UpdateService() gin.HandlerFunc {
 
 func (s *ServiceHandler) DeleteService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.Background()
 		serviceIDParam := c.Param("id")
 		id, err := strconv.ParseInt(serviceIDParam, 10, 64)
 		if err != nil {
@@ -123,7 +118,7 @@ func (s *ServiceHandler) DeleteService() gin.HandlerFunc {
 			return
 		}
 
-		err = s.manager.DeleteService(ctx, uint(id))
+		err = s.manager.DeleteService(c, uint(id))
 		if _, ok := err.(customerror.EntityNotFoundError); ok {
 			c.JSON(http.StatusNotFound, customerror.NotFoundAPIError("There is not service with the id provided"))
 			return

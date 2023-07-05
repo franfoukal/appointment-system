@@ -28,6 +28,7 @@ func InitRoutes(app *gin.Engine, resources *Resources) {
 	app.DELETE("/services/:id", resources.ServiceHandler.DeleteService())
 
 	//CRUD agenda
+	app.GET("/agendas", resources.AgendaHandler.GetAgendas())
 	app.POST("/agenda", resources.AgendaHandler.CreateAgenda())
 
 }

@@ -15,6 +15,7 @@ import (
 type (
 	AgendaManager interface {
 		CreateAgenda(ctx context.Context, agenda *domain.Agenda) (*domain.Agenda, error)
+		GetAgendas(ctx context.Context) ([]*domain.Agenda, error)
 	}
 	AgendaHandler struct {
 		manager AgendaManager
@@ -27,7 +28,6 @@ func NewAgendaHandler(manager AgendaManager) *AgendaHandler {
 
 func (a *AgendaHandler) CreateAgenda() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.Background()
 		var agendaReq AgendaRequest
 		if err := c.ShouldBindJSON(&agendaReq); err != nil {
 			logger.Errorf(err.Error())
@@ -45,7 +45,7 @@ func (a *AgendaHandler) CreateAgenda() gin.HandlerFunc {
 
 		// TODO: delete timezone and hours part to dates before saving
 
-		agenda, err := a.manager.CreateAgenda(ctx, agendaReq.ToDomain())
+		agenda, err := a.manager.CreateAgenda(c, agendaReq.ToDomain())
 		if err != nil {
 			logger.Errorf(err.Error())
 			if _, ok := err.(customerror.EntityNotFoundError); ok {
@@ -59,5 +59,24 @@ func (a *AgendaHandler) CreateAgenda() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, presenter.AgendaFromDomain(agenda))
+	}
+}
+
+func (a *AgendaHandler) GetAgendas() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		results, err := a.manager.GetAgendas(c)
+		if err != nil {
+			logger.Errorf(err.Error())
+			c.JSON(http.StatusInternalServerError, customerror.InternalServerAPIError(err.Error()))
+			c.Abort()
+			return
+		}
+
+		agendas := make([]*presenter.Agenda, 0)
+		for _, agenda := range results {
+			agendas = append(agendas, presenter.AgendaFromDomain(agenda))
+		}
+
+		c.JSON(http.StatusOK, agendas)
 	}
 }

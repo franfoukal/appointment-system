@@ -25,16 +25,18 @@ type (
 	TimeSlotStatus string
 
 	timeSlotsStatusType struct {
-		FREE  TimeSlotStatus
-		TAKEN TimeSlotStatus
-		TBC   TimeSlotStatus
+		FREE    TimeSlotStatus
+		TAKEN   TimeSlotStatus
+		BLOCKED TimeSlotStatus
+		TBC     TimeSlotStatus
 	}
 )
 
 var (
 	TimeSlotsStatusType = timeSlotsStatusType{
-		FREE:  TimeSlotStatus("FREE"),
-		TAKEN: TimeSlotStatus("TAKEN"),
-		TBC:   TimeSlotStatus("TBC"),
+		FREE:    TimeSlotStatus("FREE"),
+		TAKEN:   TimeSlotStatus("TAKEN"),
+		BLOCKED: TimeSlotStatus("BLOCKED"),
+		TBC:     TimeSlotStatus("TBC"),
 	}
 )

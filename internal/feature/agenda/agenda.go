@@ -12,6 +12,7 @@ import (
 type (
 	agendaRepository interface {
 		CreateAgenda(agenda *domain.Agenda) (*domain.Agenda, error)
+		GetAgendas() ([]*domain.Agenda, error)
 	}
 
 	serviceRepository interface {
@@ -77,6 +78,15 @@ func (a *AgendaFeature) CreateAgenda(ctx context.Context, agenda *domain.Agenda)
 	}
 
 	return agendaSaved, nil
+}
+
+func (a *AgendaFeature) GetAgendas(ctx context.Context) ([]*domain.Agenda, error) {
+	agendas, err := a.agendaRepository.GetAgendas()
+	if err != nil {
+		return nil, err
+	}
+
+	return agendas, nil
 }
 
 func (a *AgendaFeature) createTimeslots(agenda *domain.Agenda, user *domain.User) error {
