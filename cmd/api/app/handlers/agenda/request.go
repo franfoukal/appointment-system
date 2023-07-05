@@ -1,7 +1,6 @@
 package agenda
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/labscool/mb-appointment-system/internal/domain"
@@ -10,18 +9,14 @@ import (
 type (
 	AgendaRequest struct {
 		UserID  uint           `json:"user_id" validate:"required"`
-		Date    CustomTime     `json:"date" validate:"required"`
+		Date    time.Time      `json:"date" validate:"required"`
 		Details []agendaDetail `json:"details" validate:"required,dive"`
 	}
 
 	agendaDetail struct {
-		Start    CustomTime `json:"start" validate:"required"`
-		End      CustomTime `json:"end" validate:"required"`
-		Services []uint     `json:"services" validate:"required"`
-	}
-
-	CustomTime struct {
-		time.Time
+		Start    time.Time `json:"start" validate:"required"`
+		End      time.Time `json:"end" validate:"required"`
+		Services []uint    `json:"services" validate:"required"`
 	}
 )
 
@@ -30,8 +25,8 @@ func (a *AgendaRequest) ToDomain() *domain.Agenda {
 
 	for _, ad := range a.Details {
 		newDetail := domain.AgendaDetail{
-			Start:    ad.Start.Time,
-			End:      ad.End.Time,
+			Start:    ad.Start,
+			End:      ad.End,
 			Services: ad.Services,
 		}
 
@@ -40,17 +35,7 @@ func (a *AgendaRequest) ToDomain() *domain.Agenda {
 
 	return &domain.Agenda{
 		UserID:  a.UserID,
-		Date:    a.Date.Time,
+		Date:    a.Date,
 		Details: agendaDetails,
 	}
-}
-
-func (c *CustomTime) UnmarshalJSON(input []byte) error {
-	millis, err := strconv.ParseInt(string(input), 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	tm := time.Unix(0, millis*int64(time.Millisecond))
-	c.Time = tm
-	return nil
 }

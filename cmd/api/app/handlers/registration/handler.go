@@ -1,7 +1,6 @@
 package registration
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -24,7 +23,6 @@ func NewRegistrationHandler(feature users.Registration) *RegistrationHandler {
 
 func (r *RegistrationHandler) RegisterUser(enforcer *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.Background()
 		var request UserRegistrationRequest
 
 		if err := c.ShouldBindJSON(&request); err != nil {
@@ -34,7 +32,7 @@ func (r *RegistrationHandler) RegisterUser(enforcer *casbin.Enforcer) gin.Handle
 			return
 		}
 
-		newUser, err := r.feature.Register(ctx, request.ToDomain())
+		newUser, err := r.feature.Register(c, request.ToDomain())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			c.Abort()

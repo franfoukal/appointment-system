@@ -41,7 +41,7 @@ func (s *ServiceRepository) GetServices() ([]*domain.Service, error) {
 	}
 
 	if result.Error != nil {
-		return nil, customerror.InternalServerAPIError("error getting service from database")
+		return nil, customerror.InternalServerAPIError("error getting services from database")
 	}
 
 	services := make([]*domain.Service, 0)

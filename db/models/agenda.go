@@ -18,10 +18,10 @@ type (
 	}
 )
 
-func (a *Agenda) ToDomain() (*domain.Agenda, error) {
+func (a *Agenda) ToDomain() *domain.Agenda {
 	var details []domain.AgendaDetail
 	if err := json.Unmarshal(a.Details, &details); err != nil {
-		return nil, err
+		return nil
 	}
 
 	return &domain.Agenda{
@@ -29,7 +29,7 @@ func (a *Agenda) ToDomain() (*domain.Agenda, error) {
 		UserID:  a.UserID,
 		Date:    a.Date,
 		Details: details,
-	}, nil
+	}
 }
 
 func AgendaModelFromDomain(agenda *domain.Agenda) (*Agenda, error) {

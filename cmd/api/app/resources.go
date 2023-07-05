@@ -50,7 +50,7 @@ func BuildDependencies(cfg config.Config) *Resources {
 
 	switch environment.Get() {
 	case environment.Type.Local:
-		db, _ = sqlconnector.InitDBLocalConnection()
+		db = initDatabaseConnection(sqlconnector.InitDBLocalConnection)
 		GORMInstance = database.NewGormInstance(db)
 		GORMInstance.DevelopmentMigrations()
 		enforcer = configureEnforcer(GORMInstance.DB)
@@ -80,6 +80,14 @@ func BuildDependencies(cfg config.Config) *Resources {
 		ServiceHandler:      *service_handler.NewServiceHandler(serviceFeature),
 		AgendaHandler:       *agenda_handler.NewAgendaHandler(agendaFeature),
 	}
+}
+
+func initDatabaseConnection(connectionFunction func() (*sql.DB, error)) *sql.DB {
+	db, err := connectionFunction()
+	if err != nil {
+		panic(err)
+	}
+	return db
 }
 
 func configureEnforcer(ORMInstance *gorm.DB) *casbin.Enforcer {

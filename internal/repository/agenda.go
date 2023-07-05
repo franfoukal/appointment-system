@@ -31,10 +31,21 @@ func (a *AgendaRepository) CreateAgenda(agenda *domain.Agenda) (*domain.Agenda, 
 		return nil, customerror.InternalServerError(fmt.Sprintf("error saving agenda into db: %s", record.Error))
 	}
 
-	agendaResult, err := model.ToDomain()
-	if err != nil {
-		return nil, err
+	return model.ToDomain(), nil
+}
+
+func (a *AgendaRepository) GetAgendas() ([]*domain.Agenda, error) {
+	agendas := make([]*models.Agenda, 0)
+	result := a.db.Find(&agendas)
+
+	if result.Error != nil {
+		return nil, customerror.InternalServerAPIError("error getting service from database")
 	}
 
-	return agendaResult, nil
+	agendasDomain := make([]*domain.Agenda, 0)
+	for _, agenda := range agendas {
+		agendasDomain = append(agendasDomain, agenda.ToDomain())
+	}
+
+	return agendasDomain, nil
 }

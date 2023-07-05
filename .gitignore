@@ -105,4 +105,7 @@ Temporary Items
 *.env
 /docs
 
+# Ignore data volumes from docker compose
+/.volumes
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,go,macos,git
